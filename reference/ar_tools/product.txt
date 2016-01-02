@@ -1,0 +1,7 @@
+GNV is an open source, GNU and other package based, Unix environment for
+OpenVMS. It is intended to provide the important subset of Unix/Linux/POSIX
+necessary to port UNIX software to VMS. GNV consists of many parts, including
+a Unix like shell environment and utilities which provides functions typically
+found on Unix systems, but are missing, incomplete, or incorrect on VMS.
+
+For more information on GNV, see http://gnv.sourceforce.net/

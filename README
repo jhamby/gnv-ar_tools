@@ -1,0 +1,33 @@
+This is a repository for the ar_tools package that is a component of the
+GNV project for VMS.
+
+Its purpose is to provide a record of the source used for the GNV packaged
+version of the product.
+
+For GNV components that are friendly forks of an open source project, the
+reference/ directory will provide a copy of the unmodified upstream source
+used for building the package.
+
+For GNV components that have the VMS support totally integrated with the
+upstream, then the repository here will be empty.
+
+As the ar_tools project is a VMS specific project, the source will be in the
+reference/ directory, and the vms_source/ directory is empty.
+
+A VMS concealed logical name of src_root: is for the reference directory and
+a VMS concealed logical name of vms_root: is set ot the vms_source directory.
+
+These are kept separate to make it easy to determine what VMS specific changes
+where made and to allow retargeting the src_root: to a different version to
+easily support maintaining multiple versions such as release, beta, and trunk
+at the same time.
+
+The user can then create a logical name of lcl_root: for the directory that
+will contain the build products.  The lcl_root: directory tree is the only
+directory tree that the build procedure should be modifying.
+
+A logcal name search list of prj_root: is set to lcl_root:,vms_root:,src_root:
+for building the package.
+
+Mercurial was chosen for the repository as there are clients that can run on
+VMS that is native to it.

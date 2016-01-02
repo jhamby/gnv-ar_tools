@@ -1,0 +1,5 @@
+This package is derived from the GNV 3.0.1 kit which HP has released in source
+form on sourceforge.net to promote porting of package to OpenVMS.
+
+The GNV software collection is covered under various HP and other opensource
+licenses and copyrights.
