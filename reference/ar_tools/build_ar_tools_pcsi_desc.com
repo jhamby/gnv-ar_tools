@@ -12,7 +12,7 @@ $!   Move Release Notes to destination
 $!   Source kit option
 $!   Create directory lines
 $!   Add file lines for ar_tools files.
-$!   Add Link alias procedure file (used for gnv$ld.exe)
+$!   Add Link alias procedure file (used for gnv$ar.exe)
 $!   Add [.SYS$STARTUP]gnv$ar_tools_startup file
 $!   Add Release notes file.
 $!
@@ -27,7 +27,7 @@ $! above are marked N/A.
 $!
 $! A rename action section is needed to make sure that the files are
 $! created in the GNV$GNU: in the correct case, and to create the alias
-$! link [usr.bin]ld. for [usr.bin]gnv$ld.exe.
+$! link [usr.bin]ar. for [usr.bin]gnv$ar.exe.
 $!
 $! 30-Dec-2015  J. Malmberg - Ar_tools version
 $!
@@ -132,7 +132,7 @@ $! install/upgrade/postinstall steps.
 $!-----------------------------------
 $!      1. Duplicate filenames need an alias procedure.
 $!      2. ODS-5 filenames need an alias procedure.
-$!      3. Special alias links for executables (ld. -> gnv$ld.exe)
+$!      3. Special alias links for executables (ar. -> gnv$ar.exe)
 $!         if a lot, then an alias procedure is needed.
 $!      4. Rename the files to lowercase.
 $!

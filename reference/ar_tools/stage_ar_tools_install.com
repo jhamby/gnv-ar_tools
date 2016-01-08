@@ -89,8 +89,8 @@ $!
 $!   if p1 starts with "R" then remove instead of install.
 $!
 $!   If gnv$xxx.exe, then:
-$!       Source is []gnv$ld.exe
-$!       Destination1 is new_gnu:[bin]gnv$ld.exe
+$!       Source is []gnv$ar.exe
+$!       Destination1 is new_gnu:[bin]gnv$ar.exe
 $!       Destination2 is new_gnu:[bin]xxx.  (alias)
 $!       Destination2 is new_gnu:[bin]xxx.exe  (alias)
 $!       We put all in new_gnu:[bin] instead of some in [usr.bin] because
@@ -196,29 +196,6 @@ $inst_file_loop_end:
 $!
 $close flst
 $!
-$ file = "new_gnu:[bin]cc."
-$ gosub ld_aliases
-$ file = "new_gnu:[usr.bin]cc."
-$ gosub ld_aliases
-$ file = "new_gnu:[bin]cxx."
-$ gosub ld_aliases
-$ file = "new_gnu:[usr.bin]cxx."
-$ gosub ld_aliases
-$ file = "new_gnu:[lib]cpp."
-$ gosub ld_aliases
-$ file = "new_gnu:[usr.lib]cpp."
-$ gosub ld_aliases
-$ file = "new_gnu:[bin]gcc."
-$ gosub ld_aliases
-$ if arch_code .nes. "V"
-$ then
-$   file = "new_gnu:[bin]g^+^+."
-$   gosub ld_aliases
-$   file = "new_gnu:[bin]c^+^+."
-$   gosub ld_aliases
-$   file = "new_gnu:[usr.bin]c^+^+."
-$   gosub ld_aliases
-$ endif
 $!
 $all_exit:
 $   exit
@@ -228,11 +205,11 @@ $ if mode .eqs. "install"
 $ then
 $   if f$search(file) .eqs. ""
 $   then
-$       set file/enter='file' new_gnu:[usr.bin]gnv$ld.EXE
+$       set file/enter='file' new_gnu:[usr.bin]gnv$ar.EXE
 $   endif
 $   if f$search("''file'exe") .eqs. ""
 $   then
-$       set file/enter='file'exe new_gnu:[usr.bin]gnv$ld.EXE
+$       set file/enter='file'exe new_gnu:[usr.bin]gnv$ar.EXE
 $   endif
 $ else
 $   if f$search(file) .nes. "" then set file/remove 'file';*

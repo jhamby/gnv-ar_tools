@@ -54,7 +54,7 @@ $!
 $!
 $! Build the ar_tools image(s)
 $!-------------------------
-$ if f$search("gnv$ld.exe") .eqs. ""
+$ if f$search("gnv$ar.exe") .eqs. ""
 $ then
 $   @build_ar_tools.com
 $ endif

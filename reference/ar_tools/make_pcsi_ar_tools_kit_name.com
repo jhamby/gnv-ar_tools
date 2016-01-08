@@ -9,9 +9,9 @@ $!
 $!
 $! If P1 is "BETA" then the kit version type is forced to start with
 $! a "B" instead of its normal letter.  If P2 is also specified, then
-$! the first character of P2 will be uld_tool for the version.
+$! the first character of P2 will be used for the version.
 $!
-$! 23-Jul-2014  J. Malmberg	Ar_tools version
+$! 08-Jan-2016  J. Malmberg	Ar_tools version
 $!========================================================================
 $!
 $! Save default

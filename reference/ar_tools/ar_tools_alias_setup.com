@@ -5,7 +5,7 @@ $!
 $! If p1 starts with "R" then remove instead of install.
 $!
 $!
-$! 05-Jul-2014  J. Malmberg - LD_tool Version
+$! 08-Jan-2016  J. Malmberg - AR_tool Version
 $!
 $!===========================================================================
 $!
