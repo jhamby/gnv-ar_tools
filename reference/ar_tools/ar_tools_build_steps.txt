@@ -85,6 +85,33 @@ any changes.
 Edit the file PCSI_AR_TOOLS_FILE_LIST.TXT if there are new files added to the
 kit.  These files should all be ODS-2 legal filenames and directories.
 
+Note that if src_root: or vms_root: are NFS mounted disks, the
+ step of backing up the source files will probably hang or fail.
+
+You need to copy the source files to VMS mounted disks and create
+logical names SRC_ROOT1 and VMS_ROOT1 to work around this to to
+reference local disks.  Make sure src_root1:[000000] and
+vms_root1:[000000] exist and can be written to.
+
+The command procedure compare_ar_source can be used to check
+those directories and keep them up to date.
+
+    @[.vms]compare_ar_source.com SRCBCK UPDATE
+
+    This compares the reference GNU source with the backup
+    staging directory for it and updates with any changes.
+
+    @[.vms]compare_ar_source.com VMSBCK UPDATE
+
+    This compares the VMS specific source with the backup
+    staging directory for it and updates with any changes.
+
+    Leave off "UPDATE" to just check without doing any changes.
+
+    If you are not using NFS mounted disks and do not want to have a
+    separate directory for staging the sources for backup make sure
+    that src_root1: and vms_root1: do not exist.
+
 The kits will be built in the directory STAGE_ROOT:[KIT], which must be
 writable to the build procedure.
 
