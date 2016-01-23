@@ -409,10 +409,6 @@ $!
 $flst_loop_end:
 $ close flst
 $!
-$!   Add Link alias procedure file (N/A for ar_tools)
-$!-----------------------------------------------------
-$ write pdsc "   file ""[vms_bin]ar_tools_alias_setup.com"""
-$ write pdsc "     source [vms_bin]ar_tools_alias_setup.com ;"
 $!
 $!   Add [.SYS$STARTUP]gnv$ar_tools_startup file
 $!---------------------------------------
