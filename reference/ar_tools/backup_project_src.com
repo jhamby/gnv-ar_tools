@@ -1,4 +1,4 @@
-$! File: backup_ar_tools_src.com
+$! File: Backup_project_src.com
 $!
 $! Procedure to create backup save sets for installing in a PCSI kit.
 $!
@@ -8,14 +8,28 @@ $!
 $! Backup save sets are the only storage format that I can expect a
 $! VMS system to be able to extract ODS-5 filenames and directories.
 $!
-$! The make_pcsi_kit_name.com needs to be run before this procedure to
-$! properly name the files that will be created.
+$! The make_pcsi_project_kit_name.com needs to be run before this
+$! procedure to properly name the files that will be created.
 $!
 $! This file is created from a template file for the purpose of making it
 $! easier to port Unix code, particularly open source code to VMS.
 $! Therefore permission is freely granted for any use.
 $!
-$! 23-Jul-2014 J. Malmberg
+$! Copyright 2009, John Malmberg
+$!
+$! Permission to use, copy, modify, and/or distribute this software for any
+$! purpose with or without fee is hereby granted, provided that the above
+$! copyright notice and this permission notice appear in all copies.
+$!
+$! THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+$! WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+$! MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+$! ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+$! WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+$! ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+$! OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+$!
+$! 03-Jul-2016 J. Malmberg Generic version
 $!
 $!===========================================================================
 $!
@@ -36,21 +50,23 @@ $!
 $ kit_name = f$trnlnm("GNV_PCSI_KITNAME")
 $ if kit_name .eqs. ""
 $ then
-$   write sys$output "@MAKE_PCSI_AR_TOOLS_KIT_NAME.COM has not been run."
+$   write sys$output "@MAKE_PCSI_PROJECT_KIT_NAME.COM has not been run."
 $   goto all_exit
 $ endif
 $ producer = f$trnlnm("GNV_PCSI_PRODUCER")
 $ if producer .eqs. ""
 $ then
-$   write sys$output "@MAKE_PCSI_AR_TOOLS_KIT_NAME.COM has not been run."
+$   write sys$output "@MAKE_PCSI_PROJECT_KIT_NAME.COM has not been run."
 $   goto all_exit
 $ endif
 $ filename_base = f$trnlnm("GNV_PCSI_FILENAME_BASE")
 $ if filename_base .eqs. ""
 $ then
-$   write sys$output "@MAKE_PCSI_AR_TOOL_KIT_NAME.COM has not been run."
+$   write sys$output "@MAKE_PCSI_PROJECT_KIT_NAME.COM has not been run."
 $   goto all_exit
 $ endif
+$!
+$ product = f$element(2, "-", kit_name)
 $!
 $ node_swvers = f$getsyi("NODE_SWVERS")
 $ node_swvers_type = f$extract(0, 1, node_swvers)
@@ -87,7 +103,7 @@ $ my_dir = f$parse(current_default,,,"DIRECTORY") - "[" - "<" - ">" - "]"
 $!
 $ src_root = "src_root:"
 $ if f$trnlnm("src_root1") .nes. "" then src_root = "src_root1:"
-$ backup'interchange' 'src_root'[ar_tools...]*.*;0 -
+$ backup'interchange' 'src_root'['product'...]*.*;0 -
            'filename_base'_original_src.bck/sav
 $ status = $status
 $!
@@ -103,7 +119,7 @@ $ if '$severity' .eq. 1 then files_found = 1
 $!
 $ if files_found .eq. 1
 $ then
-$   backup'interchange' 'vms_root'[ar_tools...]*.*;0 -
+$   backup'interchange' 'vms_root'['product'...]*.*;0 -
             'filename_base'_vms_src.bck/sav
 $   status = $status
 $ endif

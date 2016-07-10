@@ -15,6 +15,11 @@ Modification history:
 	* Fixes for missing object modules supplied by Eric Robertson of
 	  IQware.
 	* Add help command.
+
+    04  J. Malmberg
+	* Pull in current utils.c from ld_tools
+	* Fix verify parameter to do something.
+	* Fix list, print, and extract to do something.
 */
 
 /* TODO #1: Use lbr$ calls instead of DCL shell */
@@ -31,6 +36,10 @@ Modification history:
 
 #include <descrip.h>
 #include <stsdef.h>
+
+#ifndef __VAX
+#include <ppropdef.h>
+#endif
 
 #include "utils.h"
 #include "version.h"
@@ -170,6 +179,17 @@ void do_ar_extract(void)
 			 TRUE,
 			 "w");
 
+    if (ar_mod & AR_MOD_VERBOSE) {
+	fprintf(cmd_proc, "$set verify\n");
+    }
+#ifndef __VAX
+#ifdef PPROP$C_TOKEN
+    fprintf(cmd_proc, "$set process/token=extended\n");
+#endif
+#ifdef PPROP$C_PARSE_STYLE_TEMP
+    fprintf(cmd_proc, "$set process/parse_style=extended\n");
+#endif
+#endif
   if (ar_op == AR_OP_PRINT)
     status = lib_list (vms_libname, lib_action_rtn_print);
   else
@@ -195,11 +215,17 @@ void do_ar_work(void)
   char *vms_file_path_ptr;
   int cmd_len = 0;
 
-  /* Exit success if no object files? */
-  if (objfiles_list == NULL)
-    exit(0);
-
   vms_libname = unix_to_vms(libname,FALSE);
+
+    /* Exit success if no object files? */
+  switch(ar_op) {
+  case AR_OP_MOVE:
+  case AR_OP_DELETE:
+  case AR_OP_INSERT:
+
+    if (objfiles_list == NULL)
+       exit(0);
+  }
 
   switch(ar_op) {
 
@@ -227,6 +253,17 @@ void do_ar_work(void)
 			 TRUE,
 			 "w");
 
+    if (ar_mod & AR_MOD_VERBOSE) {
+	fprintf(cmd_proc, "$set verify\n");
+    }
+#ifndef __VAX
+#ifdef PPROP$C_TOKEN
+    fprintf(cmd_proc, "$set process/token=extended\n");
+#endif
+#ifdef PPROP$C_PARSE_STYLE_TEMP
+    fprintf(cmd_proc, "$set process/parse_style=extended\n");
+#endif
+#endif
     cmd_len = fprintf(cmd_proc,"$library /replace -\n");
     if (!file_exists(libname)) {
 	cmd_len += fprintf(cmd_proc,"/create -\n");
@@ -384,7 +421,7 @@ void handle_switch(char *x)
     break;
 
   case 'v':	/* Verbose */
-    ar_mod |- AR_MOD_VERBOSE;
+    ar_mod |= AR_MOD_VERBOSE;
     break;
 
   case 'V':	/* Version */

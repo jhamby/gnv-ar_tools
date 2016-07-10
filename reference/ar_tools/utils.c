@@ -375,10 +375,11 @@ char *unix_to_vms_exp(const char *str, int is_dir) {
 }
 
 char *fix_quote(const char *str) {
-    char output[1024];
+    char *output;
     char *optr;
     int i = 0;
 
+    output = malloc(1024);
     for (optr = output; *str; ) {
         if (*str == '\"') {
             *optr++ = '\"';
@@ -387,11 +388,17 @@ char *fix_quote(const char *str) {
 	}
 	else
 	    *optr++ = *str++;
+	i++;
+	if (i > 1022) {
+	    errmsg(
+		"Warning: Value in fix_quote > 1022 characters, truncating.");
+	    break;
+	}
     }
 
     *optr = '\0';
 
-    return strdup(output);
+    return output;
 }
 
 enum suffix_type filename_suffix_type(const char *name, int len) {

@@ -1,4 +1,4 @@
-$! File: stage_ar_tool_install.com
+$! File: stage_ar_tools_install.com
 $!
 $! Stages the build products to new_gnu:[...] for testing and for building
 $! a kit.
@@ -104,14 +104,20 @@ $       source = "[]gnv$''myfile'''ttype'"
 $       dest1 = "new_gnu:[usr.bin]''tname'''ttype'"
 $       dest2 = "new_gnu:[bin]''myfile'."
 $       dest3 = "new_gnu:[bin]''myfile'.exe"
+$       dest4 = "new_gnu:[usr.bin]''myfile'."
+$       dest5 = "new_gnu:[usr.bin]''myfile'.exe"
 $       if mode .eqs. "install"
 $       then
 $           if f$search(dest1) .eqs. "" then copy 'source' 'dest1'
 $           if f$search(dest2) .eqs. "" then set file/enter='dest2' 'dest1'
 $           if f$search(dest3) .eqs. "" then set file/enter='dest3' 'dest1'
+$           if f$search(dest4) .eqs. "" then set file/enter='dest4' 'dest1'
+$           if f$search(dest5) .eqs. "" then set file/enter='dest5' 'dest1'
 $       else
-$           if f$search(dest2) .nes. "" then set file/remove 'dest2';*
+$           if f$search(dest5) .nes. "" then set file/remove 'dest5';*
+$           if f$search(dest4) .nes. "" then set file/remove 'dest4';*
 $           if f$search(dest3) .nes. "" then set file/remove 'dest3';*
+$           if f$search(dest2) .nes. "" then set file/remove 'dest2';*
 $           if f$search(dest1) .nes. "" then delete 'dest1';*
 $       endif
 $       goto inst_file_loop

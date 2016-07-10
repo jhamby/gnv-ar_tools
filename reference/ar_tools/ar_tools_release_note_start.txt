@@ -151,6 +151,12 @@ scripts.
 
 Fixes and enhancements:
 
+** Version 3.0.3
+
+*  Verbose actually implemented.
+
+*  The "t", "x", "p" options do something now.
+
 ** Version 3.0.2
 
 *  Help option.
