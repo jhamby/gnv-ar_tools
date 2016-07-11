@@ -16,6 +16,7 @@ $!
 $!=========================================================================
 $!
 $ project = "ar_tools"
+$ vms_dir = "[]"
 $!
 $! Save default
 $ default_dir = f$environment("DEFAULT")
@@ -54,17 +55,17 @@ $   goto all_exit
 $ endif
 $!
 $!
-$! Build the project image(s)
+$! Build the ar_tools image(s)
 $!-------------------------
 $ if f$search("gnv$ar.exe") .eqs. ""
 $ then
-$   @build_'project'.com
+$   @build_ar_tools.com
 $ endif
 $!
 $! Stage the images for building the kit
 $!--------------------------------------
-$ @stage_'project'_install.com remove
-$ @stage_'project'_install.com
+$ @stage_ar_tools_install.com remove
+$ @stage_ar_tools_install.com
 $!
 $!
 $!
@@ -74,12 +75,12 @@ $ @make_pcsi_'project'_kit_name.com 'p1' 'p2'
 $!
 $! Make sure that the release note file name is up to date
 $!---------------------------------------------------------
-$ file = "sys$disk:[.vms]build_''project'_release_notes.com"
+$ file = "sys$disk:''vms_dir'build_''project'_release_notes.com"
 $ if f$search(file) .nes. ""
 $ then
 $   @'file'
 $ else
-$   @[.vms]build_project_release_notes.com
+$   @'vms_dir'build_project_release_notes.com
 $ endif
 $!
 $!
@@ -89,22 +90,22 @@ $ @backup_project_src.com
 $!
 $! Regenerate the PCSI description file.
 $!--------------------------------------
-$ file = "sys$disk:[.vms]build_''project'_pcsi_desc.com"
+$ file = "sys$disk:''vms_dir'build_''project'_pcsi_desc.com"
 $ if f$search(file) .nes. ""
 $ then
 $   @'file'
 $ else
-$   @[.vms]build_project_pcsi_desc.com
+$   @'vms'build_project_pcsi_desc.com
 $ endif
 $!
 $! Regenerate the PCSI Text file.
 $!---------------------------------
-$ file = "sys$disk:[.vms]build_''project'_pcsi_text.com"
+$ file = "sys$disk:''vms_dir'build_''project'_pcsi_text.com"
 $ if f$search(file) .nes. ""
 $ then
 $   @'file'
 $ else
-$   @[.vms]build_project_pcsi_text.com
+$   @'vms_dir'build_project_pcsi_text.com
 $ endif
 $!
 $! Parse the kit name into components.
@@ -112,7 +113,7 @@ $!---------------------------------------
 $ kit_name = f$trnlnm("GNV_PCSI_KITNAME")
 $ if kit_name .eqs. ""
 $ then
-$   write sys$output "@make_pcsi_''project'_kit_name.com has not been run."
+$   write sys$output "@make_pcsi_ar_tools_kit_name.com has not been run."
 $   goto all_exit
 $ endif
 $ producer = f$element(0, "-", kit_name)
@@ -173,14 +174,14 @@ $product package 'product_name' -
  /format=sequential 'pcsi_option'
 $!
 $!
-$! VAX can not do a compressed kit.
-$! ZIP -9 "-V" does a better job, so no reason to normally build a compressed
-$! kit.
 $if f$type(zip) .eqs. "STRING"
 $then
 $   zip "-9Vj" stage_root:[kit]'kit_name'.zip stage_root:[kit]'kit_name'.pcsi
 $endif
 $!
+$! VAX can not do a compressed kit.
+$! ZIP -9 "-V" does a better job, so no reason to normally build a compressed
+$! kit.
 $!
 $all_exit:
 $ set def 'default_dir'
