@@ -108,6 +108,12 @@ $ else
 $   @'vms_dir'build_project_pcsi_text.com
 $ endif
 $!
+$ base = ""
+$ arch_name = f$edit(f$getsyi("arch_name"),"UPCASE")
+$ if arch_name .eqs. "ALPHA" then base = "AXPVMS"
+$ if arch_name .eqs. "IA64" then base = "I64VMS"
+$ if arch_name .eqs. "VAX" then base = "VAXVMS"
+$!
 $! Parse the kit name into components.
 $!---------------------------------------
 $ kit_name = f$trnlnm("GNV_PCSI_KITNAME")
@@ -126,6 +132,7 @@ $ updatepatch = f$element(4, "-", kit_name)
 $ if updatepatch .eqs. "" then updatepatch = ""
 $!
 $ version_fao = "!AS.!AS"
+$ if arch_name .eqs. "VAX" then version_fao = "!AS$5n!AS"
 $ mmversion = f$fao(version_fao, "''majorver'", "''minorver'")
 $ if updatepatch .nes. ""
 $ then
@@ -134,6 +141,12 @@ $ else
 $   version = "''mmversion'"
 $ endif
 $!
+$ node_swvers = f$getsyi("node_swvers")
+$ vms_vernum = f$extract(1, f$length(node_swvers), node_swvers)
+$ tagver = vms_vernum - "." - "." - "-"
+$ zip_name = producer + "-" + base + "-" + tagver + "-" + product_name
+$ zip_name = zip_name + "-" + mmversion + "-" + updatepatch + "-1"
+$ zip_name = f$edit(zip_name, "lowercase")
 $!
 $! Move to the base directories
 $ current_default = f$environment("DEFAULT")
@@ -176,7 +189,7 @@ $!
 $!
 $if f$type(zip) .eqs. "STRING"
 $then
-$   zip "-9Vj" stage_root:[kit]'kit_name'.zip stage_root:[kit]'kit_name'.pcsi
+$   zip "-9Vj" stage_root:[kit]'zip_name'.zip stage_root:[kit]'kit_name'.pcsi
 $endif
 $!
 $! VAX can not do a compressed kit.
