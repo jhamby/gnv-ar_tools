@@ -20,6 +20,9 @@ Modification history:
 	* Pull in current utils.c from ld_tools
 	* Fix verify parameter to do something.
 	* Fix list, print, and extract to do something.
+
+    05  J. Malmberg
+        * Do not try to process a null library file.
 */
 
 /* TODO #1: Use lbr$ calls instead of DCL shell */
@@ -144,6 +147,7 @@ char *vms_libname;
 
     vms_libname = unix_to_vms(libname,FALSE);
 
+
     status = lib_list (vms_libname, lib_action_rtn_list);
     if (!$VMS_STATUS_SUCCESS(status)) {
       fprintf(stderr,"Unable to list library file: %s\n", libname);
@@ -214,8 +218,28 @@ void do_ar_work(void)
   char *file_start_ptr;
   char *vms_file_path_ptr;
   int cmd_len = 0;
+  char * lastdot;
 
   vms_libname = unix_to_vms(libname,FALSE);
+
+  /* Hack, to do this right needs to much of a rewrite for now */
+  lastdot = strrchr(vms_libname, '.');
+  if (lastdot != NULL) {
+      switch (lastdot[1]) {
+      case 't':
+      case 'T':
+          obj_suffix = ".txt";
+          break;
+      case 'm':
+      case 'M':
+          obj_suffix = ".mar";
+          break;
+      case 'h':
+      case 'H':
+          obj_suffix = ".hlp";
+          break;
+      }
+  }
 
     /* Exit success if no object files? */
   switch(ar_op) {
@@ -545,6 +569,8 @@ int main(int argc, char *argv[])
   if (gnv_ar_debug)
     remove_temps = FALSE;
 
-  do_ar_work();
+  if (libname != NULL) {
+    do_ar_work();
+  }
   exit(0);
 }

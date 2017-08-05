@@ -42,6 +42,10 @@ Modification history:
 
 	09	John Malmberg
 		Do not prepend [] to logname:filename specifications.
+
+        10      John Malmberg
+                Fix logname:filename specification.
+                Fix list to work for all library types.
 */
 
 #include <stdio.h>
@@ -305,7 +309,7 @@ int res;
 	return strdup(unix_name);
 
     /* Need to fix up to prevent sticky defaults */
-    unsticky_name[0] == 0;
+    unsticky_name[0] = 0;
 
     /* Must have a device */
     if (strchr(unix_name,':') == NULL)
@@ -571,6 +575,107 @@ int run_cmdproc(char *cmdproc, char *outfile) {
 }
 
 /*
+** lib_open opens up an existing library module.
+**
+*/
+unsigned long lib_open (const struct dsc$descriptor_s * lib_name_d,
+                        unsigned long *lib_index,
+                        unsigned long *lib_func,
+                        unsigned long *lib_type)
+{
+    int status;
+
+    status = lbr$ini_control(lib_index, lib_func, lib_type, NULL);
+    if(!$VMS_STATUS_SUCCESS(status)) {
+        return status;
+    }
+
+    status = lbr$open(lib_index, lib_name_d, NULL, NULL, NULL, NULL, NULL);
+    if(!$VMS_STATUS_SUCCESS(status)) {
+        int status1;
+        status1 = lbr$close(&lib_index);
+    }
+    return status;
+}
+
+/*
+** lib_open_probe opens up an existing library module making several probes to
+** determine the library type.  The library type is returned in
+** lib_type.
+**
+*/
+unsigned long lib_open_probe (const char * name,
+                              unsigned long *lib_index,
+                              unsigned long *lib_func,
+                              unsigned long *lib_type)
+{
+    unsigned long lib_type1;
+    unsigned long lib_type2;
+    unsigned long lib_type_strt;
+    unsigned long status;
+    struct dsc$descriptor_s lib_name_d;
+
+#ifdef __ia64
+    lib_type1 = LBR$C_TYP_ELFOBJ;
+    lib_type2 = LBR$C_TYP_ELFSHSTB;
+    lib_type_strt = LBR$C_TYP_ESHSTB;
+#else
+# ifdef __alpha
+    lib_type1 = LBR$C_TYP_EOBJ;
+    lib_type2 = LBR$C_TYP_ESHSTB;
+    lib_type_strt = LBR$C_TYP_DECMX;
+# else
+#  ifdef __vax
+    lib_type1 = LBR$C_TYP_OBJ;
+    lib_type2 = LBR$C_TYP_SHSTB;
+    lib_type_strt = LBR$C_TYP_DECMX;
+#  else
+#   error Unknown architecture
+    lib_type1 =-1;
+    lib_type2 =-1;
+    lib_type_strt = 0;
+#  endif
+# endif
+#endif
+
+/* Missing symbol */
+#ifndef LBR_TYPMISMCH
+# define LBR_TYPMISMCH 2525232
+#endif
+
+    lib_name_d.dsc$w_length = strlen(name);
+    lib_name_d.dsc$b_dtype = DSC$K_DTYPE_T;
+    lib_name_d.dsc$b_class = DSC$K_CLASS_S;
+    lib_name_d.dsc$a_pointer = (char *)name; /* Cast ok */
+
+    status = lib_open(&lib_name_d, lib_index, lib_func, &lib_type1);
+    if (status == LBR_TYPMISMCH) {
+        status = lib_open(&lib_name_d, lib_index, lib_func, &lib_type2);
+        if (status == LBR_TYPMISMCH) {
+            /* Tried the two obvious ones, now try everyting else */
+            int i;
+            i = lib_type_strt;
+            while (i > 0) {
+                unsigned long i1;
+                i1 = i;
+                status = lib_open(&lib_name_d, lib_index, lib_func, &i1);
+                if ($VMS_STATUS_SUCCESS(status)) {
+                  *lib_type = i1;
+                  break;
+                } else {
+                    if (status != LBR_TYPMISMCH) {
+                        break;
+                    }
+                }
+                i--;
+            }
+        }
+    }
+    return status;
+}
+
+
+/*
 ** lib_list opens an object library and obtains a list of all the module
 ** names. For each module, artn is called.
 **
@@ -584,38 +689,22 @@ char *lib_action_rtn_name;
 unsigned long lib_list (char *name, unsigned long (*artn)() )
 {
     unsigned long status, lib_index, lib_func, lib_type, lib_index_number;
-    struct dsc$descriptor lib_name_d;
 
     lib_action_rtn_name = name; /* needed by artn */
 
     lib_func = LBR$C_READ;
-#ifdef __ia64
-    lib_type = LBR$C_TYP_ELFOBJ;
-#else
-#ifdef __alpha
-    lib_type = LBR$C_TYP_EOBJ;
-#else
-#ifdef __vax
-    lib_type = LBR$C_TYP_OBJ;
-#else
-#error Unknown architecture
-    lib_type =-1;
-#endif
-#endif
-#endif
-    status = lbr$ini_control(&lib_index, &lib_func, &lib_type);
-    if(!$VMS_STATUS_SUCCESS(status)) return status;
-
-    lib_name_d.dsc$w_length = strlen(name);
-    lib_name_d.dsc$b_dtype = DSC$K_DTYPE_T;
-    lib_name_d.dsc$b_class = DSC$K_CLASS_S;
-    lib_name_d.dsc$a_pointer = name;
-    status = lbr$open(&lib_index, &lib_name_d, 0, 0, 0, 0, 0);
+    lib_index = 0;
+    status = lib_open_probe(name, &lib_index, &lib_func, &lib_type);
     if(!$VMS_STATUS_SUCCESS(status)) return status;
 
     lib_index_number = 1;
     status = lbr$get_index(&lib_index, &lib_index_number, artn, 0);
-    if(!$VMS_STATUS_SUCCESS(status)) return status;
+
+    if(!$VMS_STATUS_SUCCESS(status)) {
+        int status1;
+        status1 = lbr$close(&lib_index);
+        return status;
+    }
 
     status = lbr$close(&lib_index);
     if(!$VMS_STATUS_SUCCESS(status)) return status;

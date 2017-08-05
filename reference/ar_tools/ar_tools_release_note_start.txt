@@ -151,6 +151,17 @@ scripts.
 
 Fixes and enhancements:
 
+** Version 3.0.4
+
+*  Filenames that translate to VMS filenames of foo:bar were not handled
+   properly.  https://sourceforge.net/p/gnv/bugs/124/
+
+*  Fix access violation if --help or --version used with out a library name.
+   https://sourceforge.net/p/gnv/bugs/123/
+
+*  Library listing support now for all library types.
+   https://sourceforge.net/p/gnv/bugs/111/
+
 ** Version 3.0.3
 
 *  Verbose actually implemented.
